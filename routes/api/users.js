@@ -3,10 +3,40 @@ const router = express.Router();
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const config = require("config");
 const { check, validationResult } = require("express-validator");
 
 const User = require("../../models/User");
+
+//Function to send  email.
+const sendEmail = async (email) => {
+  let testAccount = await nodemailer.createTestAccount();
+  var Transport = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass,
+    },
+  });
+
+  let sender = "AHOD_email_verification";
+  const mailOptions = {
+    from: sender,
+    to: email,
+    subject: "Email confirmation for AHOD",
+    html: `Press <a href="https://localhost:3000/users/verify/uniqueNumber">here</a> to verify account.`,
+  };
+
+  Transport.sendMail(mailOptions, (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(mailOptions.html);
+    }
+  });
+};
 // @route  POST api/users
 // @desc   register user
 // @access Public
@@ -70,11 +100,21 @@ router.post(
           res.json({ token });
         }
       );
+      sendEmail(email);
     } catch (err) {
       console.log(err.message);
       res.status(500).send("Server Error");
     }
   }
 );
+
+router.get(`/verify/:token`, (req, res) => {
+  const { token } = req.params;
+  if (token == "123") {
+    res.status(400).send(token);
+  } else {
+    res.status(401).send("Verification could not be made");
+  }
+});
 
 module.exports = router;
