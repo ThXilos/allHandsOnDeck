@@ -5,12 +5,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const config = require("config");
+const auth = require("../../middleware/auth");
 const { check, validationResult } = require("express-validator");
 
 const User = require("../../models/User");
 
 //Function to send  email.
-const sendEmail = async (email) => {
+
+const sendEmail = async (email, uniqueString) => {
   let testAccount = await nodemailer.createTestAccount();
   var Transport = nodemailer.createTransport({
     host: "smtp.ethereal.email",
@@ -26,7 +28,7 @@ const sendEmail = async (email) => {
     from: sender,
     to: email,
     subject: "Email confirmation for AHOD",
-    html: `Press <a href="https://localhost:3000/users/verify/uniqueNumber">here</a> to verify account.`,
+    html: `Press <a href="http://localhost:5000/api/users/verify/${uniqueString}">here</a> to verify account.`,
   };
 
   Transport.sendMail(mailOptions, (err, res) => {
@@ -37,6 +39,21 @@ const sendEmail = async (email) => {
     }
   });
 };
+
+//Function the creates a random number from
+const randomString = () => {
+  const len = 8;
+  let randStr = "";
+  for (let i = 0; i < len; i++) {
+    const ch = Math.floor(Math.random() * 10) + 1;
+    randStr += ch;
+  }
+
+  return randStr;
+};
+
+const customToken = randomString();
+
 // @route  POST api/users
 // @desc   register user
 // @access Public
@@ -100,7 +117,8 @@ router.post(
           res.json({ token });
         }
       );
-      sendEmail(email);
+
+      sendEmail(email, customToken);
     } catch (err) {
       console.log(err.message);
       res.status(500).send("Server Error");
@@ -108,12 +126,20 @@ router.post(
   }
 );
 
-router.get(`/verify/:token`, (req, res) => {
+router.get(`/verify/:token`, auth, async (req, res) => {
   const { token } = req.params;
-  if (token == "123") {
-    res.status(400).send(token);
-  } else {
-    res.status(401).send("Verification could not be made");
+  const { id, email } = req.user;
+  try {
+    if (token === customToken) {
+      const validated = { emailConfirmed: true };
+      console.log(id);
+      await User.findByIdAndUpdate(id, validated);
+      res.status(200).send("Email Validated");
+    } else {
+      console.log("Can't validate email");
+    }
+  } catch (err) {
+    console.log(err.message);
   }
 });
 
