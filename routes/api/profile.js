@@ -43,7 +43,9 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { status, skills } = req.body;
+    const { status, skills, bio, facebook, instagram } = req.body;
+
+    //building profile object
     const profileFields = {};
     profileFields.user = req.user.id;
 
@@ -51,11 +53,47 @@ router.post(
       profileFields.status = status;
     }
 
+    if (bio) {
+      profileFields.bio = bio;
+    }
+
     if (skills) {
       profileFields.skills = skills.split(",").map((skill) => skill.trim());
     }
-    console.log(profileFields.skills);
-    res.send("Hello");
+
+    //building profile object
+    profileFields.social = {};
+
+    if (facebook) {
+      profileFields.social.facebook = facebook;
+    }
+
+    if (instagram) {
+      profileFields.social.instagram = instagram;
+    }
+
+    try {
+      let profile = await Profile.findOne({ user: req.user.id });
+
+      if (profile) {
+        //Update profile
+        profile = await Profile.findOneAndUpdate(
+          { user: req.user.id },
+          { $set: profileFields },
+          { new: true }
+        );
+
+        return res.json(profile);
+      }
+
+      //Create profile
+      profile = new Profile(profileFields);
+      await profile.save();
+      res.json(profile);
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).send("Server Error");
+    }
   }
 );
 module.exports = router;
