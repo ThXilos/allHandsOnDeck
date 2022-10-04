@@ -3,54 +3,12 @@ const router = express.Router();
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const { sendEmail, randomString } = require("../../mailer/mailer.js");
 const config = require("config");
 const auth = require("../../middleware/auth");
 const { check, validationResult } = require("express-validator");
 
 const User = require("../../models/User");
-
-//Function to send  email.
-
-const sendEmail = async (email, uniqueString) => {
-  let testAccount = await nodemailer.createTestAccount();
-  var Transport = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
-    },
-  });
-
-  let sender = "AHOD_email_verification";
-  const mailOptions = {
-    from: sender,
-    to: email,
-    subject: "Email confirmation for AHOD",
-    html: `Press <a href="http://localhost:5000/api/users/verify/${uniqueString}">here</a> to verify account.`,
-  };
-
-  Transport.sendMail(mailOptions, (err, res) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(mailOptions.html);
-    }
-  });
-};
-
-//Function the creates a random number from
-const randomString = () => {
-  const len = 8;
-  let randStr = "";
-  for (let i = 0; i < len; i++) {
-    const ch = Math.floor(Math.random() * 10) + 1;
-    randStr += ch;
-  }
-
-  return randStr;
-};
 
 const customToken = randomString();
 
@@ -132,7 +90,6 @@ router.get(`/verify/:token`, auth, async (req, res) => {
   try {
     if (token === customToken) {
       const validated = { emailConfirmed: true };
-      console.log(id);
       await User.findByIdAndUpdate(id, validated);
       res.status(200).send("Email Validated");
     } else {
