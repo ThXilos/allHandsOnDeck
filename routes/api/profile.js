@@ -35,6 +35,8 @@ router.post(
     [
       check("status", "Status is required").not().isEmpty(),
       check("skills", "Skills are required").not().isEmpty(),
+      check("from", "From date is required").not().isEmpty(),
+      check("to", "To date is required").not().isEmpty(),
     ],
   ],
   async (req, res) => {
@@ -43,7 +45,16 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { status, skills, bio, facebook, instagram } = req.body;
+    const {
+      status,
+      skills,
+      bio,
+      facebook,
+      instagram,
+      from,
+      to,
+      hasAccomendation,
+    } = req.body;
 
     //building profile object
     const profileFields = {};
@@ -61,6 +72,18 @@ router.post(
       profileFields.skills = skills.split(",").map((skill) => skill.trim());
     }
 
+    if (hasAccomendation) {
+      profileFields.hasAccomendation = hasAccomendation;
+    }
+
+    profileFields.availability = {};
+    if (from) {
+      profileFields.availability.from = from;
+    }
+
+    if (to) {
+      profileFields.availability.to = to;
+    }
     //building profile object
     profileFields.social = {};
 
@@ -128,6 +151,78 @@ router.get("/user/:user_id", async (req, res) => {
     if (error.kind === "ObjectId") {
       return res.status(400).json({ msg: "Profile is not found." });
     }
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route  DELETE api/profile/
+// @desc   DELETE User profile
+// @access Private
+
+router.delete("/", auth, async (req, res) => {
+  try {
+    // @todo  - remove users posts.
+    //remove profile
+    await Profile.findOneAndRemove({ user: req.user.id });
+    await User.findOneAndRemove({ _id: req.user.id });
+    ελ;
+    res.json({ msg: "User deleted." });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route  PUT api/profile/like/:profile_id
+// @desc   Like user profile
+// @access Private
+
+router.put("/like/:profile_id", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findById(req.params.profile_id);
+    //Check if the post has already been liked.
+    if (
+      profile.likes.filter((like) => like.user.toString() === req.user.id)
+        .length > 0
+    ) {
+      return res.status(400).json({ msg: "Profile already liked" });
+    }
+
+    profile.likes.unshift({ user: req.user.id });
+    await profile.save();
+    res.json(profile.likes);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// @route  PUT api/profile/unlike/:profile_id
+// @desc   Unlike user profile
+// @access Private
+
+router.put("/unlike/:profile_id", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findById(req.params.profile_id);
+    //Check if the post has already been liked.
+    if (
+      profile.likes.filter((like) => like.user.toString() === req.user.id)
+        .length === 0
+    ) {
+      return res.status(400).json({ msg: "Profile has not yet been liked." });
+    }
+    //Get remove index.
+    //Explanation because its cool, you map the like array and return the index of the like that has a user id that matches the  current user's id.
+    const removeIndex = profile.likes
+      .map((like) => like.user.toString())
+      .indexOf(req.user.id);
+    //and then using the index you remove the like from the likes array with splice(INDEX,NUMBER OF ELEMENTS TO REMOVE)
+    profile.likes.splice(removeIndex, 1);
+
+    await profile.save();
+    res.json(profile.likes);
+  } catch (error) {
+    console.log(error.message);
     res.status(500).send("Server Error");
   }
 });

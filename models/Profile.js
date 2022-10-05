@@ -24,6 +24,29 @@ const ProfileSchema = new mongoose.Schema({
       type: String,
     },
   },
+  availability: {
+    from: {
+      type: Date,
+      required: true,
+    },
+    to: {
+      type: Date,
+      required: true,
+    },
+  },
+  hasAccomendation: {
+    type: Boolean,
+    default: false,
+  },
+  likes: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users",
+      },
+    },
+  ],
+
   date: {
     type: Date,
     default: Date.now,
