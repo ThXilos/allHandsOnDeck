@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
+import axios from "axios";
+
 export const Register = () => {
   const [formData, setFormData] = React.useState({
     name: "",
@@ -18,12 +20,12 @@ export const Register = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== password2) {
       console.log("The passwords do not match.");
     } else {
-      console.log(formData);
+      console.log("Success!");
     }
   };
 
@@ -76,6 +78,9 @@ export const Register = () => {
             onChange={handleChange}
           ></input>
         </div>
+        <p>
+          Already have an account? <Link to="/login">Sign In</Link>
+        </p>
         <div className="bottom-part">
           <button type="submit">Sign up</button>
         </div>
@@ -98,6 +103,14 @@ const Wrapper = styled.section`
     justify-content: center;
     align-items: center;
     gap:2rem;
+    p{
+      font-size:0.8rem;
+    a{
+      all:unset;
+      color:#395a8d;
+      cursor:pointer;
+    }
+    }
   }
 
   .top-part {
