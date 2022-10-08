@@ -21,7 +21,7 @@ export const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== password2) {
-      console.log("passwords dont match");
+      console.log("The passwords do not match.");
     } else {
       console.log(formData);
     }
@@ -112,6 +112,7 @@ const Wrapper = styled.section`
 
     input {
       height: 30px;
+      font-size: 1.2rem;
     }
   }
 
