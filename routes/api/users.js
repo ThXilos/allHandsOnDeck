@@ -75,7 +75,6 @@ router.post(
           res.json({ token });
         }
       );
-
       sendEmail(email, customToken);
     } catch (err) {
       console.log(err.message);
@@ -90,9 +89,13 @@ router.get(`/verify/:token`, async (req, res) => {
   // const { id, email, customToken } = req.user;
   try {
     let user = await User.findOne({ customToken });
-    const { id } = user;
+    const { id, validated } = user;
     if (user.customToken === token) {
       const validated = { emailConfirmed: true };
+
+      if (user.emailConfirmed === true) {
+        return res.status(409).send("Email already validated");
+      }
       await User.findByIdAndUpdate(id, validated);
       res.status(200).send("Email Validated");
     } else {

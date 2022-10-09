@@ -1,10 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { login } from "../../actions/auth";
 
 import axios from "axios";
 
-export const Login = () => {
+export const Login = ({ login, isAuthenticated, emailConfirmed }) => {
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
@@ -20,8 +23,14 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Success");
+    login(email, password);
   };
+
+  //Redirect if logged in.
+  if (isAuthenticated && emailConfirmed) {
+    console.log(isAuthenticated && emailConfirmed);
+    return <Navigate to="/dashboard" />;
+  }
 
   return (
     <Wrapper>
@@ -119,4 +128,12 @@ const Wrapper = styled.section`
   }
 `;
 
-export default Login;
+Login.proTypes = {
+  login: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  emailConfirmed: state.auth.user?.emailConfirmed,
+});
+export default connect(mapStateToProps, { login })(Login);
