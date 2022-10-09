@@ -1,10 +1,13 @@
 import React from "react";
 import styled from "styled-components";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-
+import { setAlert } from "../../actions/alert";
+import { register } from "../../actions/auth";
+import PropTypes from "prop-types";
 import axios from "axios";
 
-export const Register = () => {
+export const Register = ({ setAlert, register }) => {
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -23,9 +26,9 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== password2) {
-      console.log("The passwords do not match.");
+      setAlert("Passwords do not match", "danger", 5000);
     } else {
-      console.log("Success!");
+      register({ name, email, password });
     }
   };
 
@@ -146,4 +149,8 @@ const Wrapper = styled.section`
   }
 `;
 
-export default Register;
+Register.propTypes = {
+  setAlert: PropTypes.func.isRequired,
+  register: PropTypes.func.isRequired,
+};
+export default connect(null, { setAlert, register })(Register);

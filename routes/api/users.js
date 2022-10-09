@@ -50,7 +50,7 @@ router.post(
         d: "mm",
       });
 
-      user = new User({ name, email, avatar, email });
+      user = new User({ name, email, avatar, email, customToken });
 
       //Encrypt the password
       const salt = await bcrypt.genSalt(10);
@@ -84,16 +84,19 @@ router.post(
   }
 );
 
-router.get(`/verify/:token`, auth, async (req, res) => {
+// Add extra attribute to register user.
+router.get(`/verify/:token`, async (req, res) => {
   const { token } = req.params;
-  const { id, email } = req.user;
+  // const { id, email, customToken } = req.user;
   try {
-    if (token === customToken) {
+    let user = await User.findOne({ customToken });
+    const { id } = user;
+    if (user.customToken === token) {
       const validated = { emailConfirmed: true };
       await User.findByIdAndUpdate(id, validated);
       res.status(200).send("Email Validated");
     } else {
-      console.log("Can't validate email");
+      res.status(401).send("Invalid Token match.");
     }
   } catch (err) {
     console.log(err.message);
