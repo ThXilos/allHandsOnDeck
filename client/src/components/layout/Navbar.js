@@ -1,8 +1,41 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { logout } from "../../actions/auth";
 import styled from "styled-components";
 
-export const Navbar = () => {
+export const Navbar = ({ isAuthenticated, loading, logout }) => {
+  const authLinks = (
+    <ul>
+      <li>
+        <a onClick={logout} href="#!">
+          Log-out
+        </a>
+      </li>
+    </ul>
+  );
+
+  const guestLinks = (
+    <ul>
+      <li>
+        <Link to="/pickaroos">
+          <i></i>Pickaroos
+        </Link>
+      </li>
+      <li>
+        <Link to="/register">
+          <i></i>Register
+        </Link>
+      </li>
+      <li>
+        <Link to="/login">
+          <i></i>Login
+        </Link>
+      </li>
+    </ul>
+  );
+
   return (
     <Wrapper>
       <nav className="">
@@ -12,23 +45,7 @@ export const Navbar = () => {
             <span>*</span>Picka<span>roo</span>
           </Link>
         </h1>
-        <ul>
-          <li>
-            <Link to="/pickaroos">
-              <i></i>Pickaroos
-            </Link>
-          </li>
-          <li>
-            <Link to="/register">
-              <i></i>Register
-            </Link>
-          </li>
-          <li>
-            <Link to="/login">
-              <i></i>Login
-            </Link>
-          </li>
-        </ul>
+        {!loading && <>{isAuthenticated ? authLinks : guestLinks}</>}
       </nav>
     </Wrapper>
   );
@@ -65,4 +82,15 @@ const Wrapper = styled.section`
   }
 `;
 
-export default Navbar;
+Navbar.propTypes = {
+  logout: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  loading: state.auth.loading,
+  isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { logout })(Navbar);
