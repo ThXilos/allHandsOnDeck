@@ -20,7 +20,7 @@ export const Navbar = ({ isAuthenticated, loading, logout }) => {
     <ul>
       <li>
         <Link to="/pickaroos">
-          <i></i>Pickaroos
+          <i></i>Pickaroons
         </Link>
       </li>
       <li>
@@ -42,7 +42,7 @@ export const Navbar = ({ isAuthenticated, loading, logout }) => {
         <h1>
           <Link to="/">
             <i></i>
-            <span>*</span>Picka<span>roo</span>
+            <span>*</span>Picka<span>roon</span>
           </Link>
         </h1>
         {!loading && <>{isAuthenticated ? authLinks : guestLinks}</>}

@@ -11,7 +11,7 @@ export const Landing = () => {
           alt="pickaroo"
         />
         <h1>
-          <span>*</span>Picka<span>roo</span>
+          <span>*</span>Picka<span>roon</span>
         </h1>
       </div>
       <div className="actions">
