@@ -1,13 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { logout } from "../../actions/auth";
 import styled from "styled-components";
 
 export const Navbar = ({ isAuthenticated, loading, logout }) => {
+  const currentPage = useLocation();
   const authLinks = (
     <ul>
+      <li>
+        <Link to="/dashboard">Profile</Link>
+      </li>
       <li>
         <a onClick={logout} href="#!">
           Log-out
@@ -18,11 +22,6 @@ export const Navbar = ({ isAuthenticated, loading, logout }) => {
 
   const guestLinks = (
     <ul>
-      <li>
-        <Link to="/pickaroos">
-          <i></i>Pickaroons
-        </Link>
-      </li>
       <li>
         <Link to="/register">
           <i></i>Register
@@ -45,7 +44,9 @@ export const Navbar = ({ isAuthenticated, loading, logout }) => {
             <span>*</span>Picka<span>roon</span>
           </Link>
         </h1>
-        {!loading && <>{isAuthenticated ? authLinks : guestLinks}</>}
+        {currentPage.pathname !== "/" && !loading && (
+          <>{isAuthenticated ? authLinks : guestLinks}</>
+        )}
       </nav>
     </Wrapper>
   );

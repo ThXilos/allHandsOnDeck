@@ -27,8 +27,7 @@ export const Login = ({ login, isAuthenticated, emailConfirmed }) => {
   };
 
   //Redirect if logged in.
-  if (isAuthenticated && emailConfirmed) {
-    console.log(isAuthenticated && emailConfirmed);
+  if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
   }
 

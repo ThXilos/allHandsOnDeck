@@ -7,7 +7,12 @@ import { register } from "../../actions/auth";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-export const Register = ({ setAlert, register, isAuthenticated }) => {
+export const Register = ({
+  setAlert,
+  register,
+  isAuthenticated,
+  emailConfirmed,
+}) => {
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -157,10 +162,12 @@ Register.propTypes = {
   setAlert: PropTypes.func.isRequired,
   register: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
+  emailConfirmed: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
+  emailConfirmed: state.auth.emailConfirmed,
 });
 
 export default connect(mapStateToProps, { setAlert, register })(Register);

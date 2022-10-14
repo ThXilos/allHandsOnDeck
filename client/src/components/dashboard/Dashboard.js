@@ -1,11 +1,40 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import Spinner from "../layout/Spinner";
 import styled from "styled-components";
+import { connect } from "react-redux";
+import { getCurrentProfile } from "../../actions/profile";
+import DashboardActions from "./DashboardActions";
 
-const Dashboard = (props) => {
+const Dashboard = ({
+  getCurrentProfile,
+  auth: { user },
+  profile: { profile, loading },
+}) => {
+  useEffect(() => {
+    getCurrentProfile();
+  }, []);
   return (
     <Wrapper>
-      <div>Dashboard</div>
+      {loading && profile === null ? (
+        <Spinner />
+      ) : (
+        <>
+          <h1>Welcome {user && user.name}</h1>
+          {profile !== null ? (
+            <>
+              <h2>Profile information</h2>
+              <DashboardActions />
+            </>
+          ) : (
+            <>
+              <h2>Please add some info to your profile</h2>
+              <Link to="create-profile">Create Profile</Link>
+            </>
+          )}
+        </>
+      )}
     </Wrapper>
   );
 };
@@ -16,6 +45,7 @@ const Wrapper = styled.section`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items:center;
   
   form {
     
@@ -68,6 +98,15 @@ const Wrapper = styled.section`
   }
 `;
 
-Dashboard.propTypes = {};
+Dashboard.propTypes = {
+  getCurrentProfile: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  profile: PropTypes.object.isRequired,
+};
 
-export default Dashboard;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  profile: state.profile,
+});
+
+export default connect(mapStateToProps, { getCurrentProfile })(Dashboard);

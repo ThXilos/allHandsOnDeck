@@ -6,7 +6,7 @@ import { Route, Navigate } from "react-router-dom";
 
 const PrivateRoute = ({ auth: { loading, isAuthenticated }, children }) => {
   if (!loading && !isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   } else {
     return children;
   }
