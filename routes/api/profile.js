@@ -165,7 +165,7 @@ router.delete("/", auth, async (req, res) => {
     //remove profile
     await Profile.findOneAndRemove({ user: req.user.id });
     await User.findOneAndRemove({ _id: req.user.id });
-    ελ;
+
     res.json({ msg: "User deleted." });
   } catch (error) {
     console.log(error.message);
@@ -185,14 +185,25 @@ router.put("/like/:profile_id", auth, async (req, res) => {
       profile.likes.filter((like) => like.user.toString() === req.user.id)
         .length > 0
     ) {
-      return res.status(400).json({ msg: "Profile already liked" });
+      const removeIndex = profile.likes
+        .map((like) => like.user.toString())
+        .indexOf(req.user.id);
+      //and then using the index you remove the like from the likes array with splice(INDEX,NUMBER OF ELEMENTS TO REMOVE)
+      profile.likes.splice(removeIndex, 1);
+    } else {
+      profile.likes.unshift({ user: req.user.id });
     }
 
-    profile.likes.unshift({ user: req.user.id });
+    // if (
+    //   profile.likes.filter((like) => like.user.toString() === req.user.id)
+    //     .length === 0
+    // ) {
+    //   profile.likes.unshift({ user: req.user.id });
+    //   console.log("profile Liked");
+    // }
     await profile.save();
     res.json(profile.likes);
   } catch (error) {
-    console.log(error.message);
     res.status(500).send("Server Error");
   }
 });
@@ -201,30 +212,30 @@ router.put("/like/:profile_id", auth, async (req, res) => {
 // @desc   Unlike user profile
 // @access Private
 
-router.put("/unlike/:profile_id", auth, async (req, res) => {
-  try {
-    const profile = await Profile.findById(req.params.profile_id);
-    //Check if the post has already been liked.
-    if (
-      profile.likes.filter((like) => like.user.toString() === req.user.id)
-        .length === 0
-    ) {
-      return res.status(400).json({ msg: "Profile has not yet been liked." });
-    }
-    //Get remove index.
-    //Explanation because its cool, you map the like array and return the index of the like that has a user id that matches the  current user's id.
-    const removeIndex = profile.likes
-      .map((like) => like.user.toString())
-      .indexOf(req.user.id);
-    //and then using the index you remove the like from the likes array with splice(INDEX,NUMBER OF ELEMENTS TO REMOVE)
-    profile.likes.splice(removeIndex, 1);
+// router.put("/unlike/:profile_id", auth, async (req, res) => {
+//   try {
+//     const profile = await Profile.findById(req.params.profile_id);
+//     //Check if the post has already been liked.
+//     if (
+//       profile.likes.filter((like) => like.user.toString() === req.user.id)
+//         .length === 0
+//     ) {
+//       console.log("profile unliked");
+//       return res.status(400).json({ msg: "Profile has not yet been liked." });
+//     }
+//     //Get remove index.
+//     //Explanation because its cool, you map the like array and return the index of the like that has a user id that matches the  current user's id.
+//     const removeIndex = profile.likes
+//       .map((like) => like.user.toString())
+//       .indexOf(req.user.id);
+//     //and then using the index you remove the like from the likes array with splice(INDEX,NUMBER OF ELEMENTS TO REMOVE)
+//     profile.likes.splice(removeIndex, 1);
 
-    await profile.save();
-    res.json(profile.likes);
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).send("Server Error");
-  }
-});
+//     await profile.save();
+//     res.json(profile.likes);
+//   } catch (error) {
+//     res.status(500).send("Server Error");
+//   }
+// });
 
 module.exports = router;

@@ -132,6 +132,9 @@ const CreateProfile = ({ isAuthenticated, createProfile }) => {
         <p></p>
         <div className="bottom-part">
           <button type="submit">Save</button>
+          <Link to="/dashboard">
+            <button type="button">Back</button>
+          </Link>
         </div>
       </form>
     </Wrapper>
@@ -183,6 +186,7 @@ const Wrapper = styled.section`
   .bottom-part {
     display: flex;
     justify-content: center;
+    gap:1rem;
     button {
         border: none;
         background: #395a8d;

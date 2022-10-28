@@ -11,7 +11,7 @@ export const Landing = ({ auth: { isAuthenticated } }) => {
     <Wrapper>
       <div className="container">
         <img
-          className="img"
+          className="logo"
           src="https://static.vecteezy.com/system/resources/previews/005/547/559/original/cute-man-head-pirates-beard-logo-symbol-icon-design-illustration-vector.jpg"
           alt="pickaroo"
         />
@@ -39,6 +39,18 @@ const Wrapper = styled.section`
   gap: 2rem;
   justify-content: center;
   min-height: 100vh;
+
+  img {
+    width: 20%;
+    border-radius: 100%;
+    opacity: 0.5;
+  }
+
+  @media only screen and (max-width: 600px) {
+    img {
+      width: 50%;
+    }
+  }
 
   .container {
     margin-top: 100px;
@@ -89,14 +101,6 @@ const Wrapper = styled.section`
 
   .btn-login:hover {
     cursor: pointer;
-  }
-
-  .img {
-    width: 50%;
-    opacity: 0.4;
-    border-radius: 100%;
-    right: 25%;
-    top: 16%;
   }
 `;
 

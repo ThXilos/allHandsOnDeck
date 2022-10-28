@@ -23,21 +23,21 @@ const EditProfile = ({
     hasAccomendation: "",
   });
 
-  //   useEffect(() => {
-  //     getCurrentProfile();
-  //     setFormData({
-  //       status: loading || !profile.status ? "" : profile.status,
-  //       bio: loading || !profile.bio ? "" : profile.bio,
-  //       skills: loading || !profile.skills ? "" : profile.skills,
-  //       facebook: loading || !profile.facebook ? "" : profile.facebook,
-  //       instagram: loading || !profile.instagram ? "" : profile.instagram,
-  //       from:
-  //         loading || !profile.availability?.from ? "" : profile.availability.from,
-  //       to: loading || !profile.availability?.to ? "" : profile.availability?.to,
-  //       hasAccomendation:
-  //         loading || !profile.hasAccomendation ? "" : profile.hasAccomendation,
-  //     });
-  //   }, [loading, getCurrentProfile]);
+  useEffect(() => {
+    getCurrentProfile();
+    setFormData({
+      status: loading || !profile.status ? "" : profile.status,
+      bio: loading || !profile.bio ? "" : profile.bio,
+      skills: loading || !profile.skills ? "" : profile.skills,
+      facebook: loading || !profile.facebook ? "" : profile.facebook,
+      instagram: loading || !profile.instagram ? "" : profile.instagram,
+      from:
+        loading || !profile.availability?.from ? "" : profile.availability.from,
+      to: loading || !profile.availability?.to ? "" : profile.availability?.to,
+      hasAccomendation:
+        loading || !profile.hasAccomendation ? "" : profile.hasAccomendation,
+    });
+  }, [loading]);
 
   const {
     status,
@@ -52,7 +52,7 @@ const EditProfile = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createProfile(formData, navigate);
+    createProfile(formData, navigate, true);
   };
 
   const handleChange = (e) => {
@@ -71,7 +71,7 @@ const EditProfile = ({
           <select name="status" value={status} onChange={handleChange}>
             <option value="0">*Select status</option>
             <option value="worker">Worker</option>
-            <option value="worker">Management</option>
+            <option value="management">Management</option>
           </select>
           <label className="form-labels" of="bio">
             Short Bio:
@@ -85,7 +85,7 @@ const EditProfile = ({
             onChange={handleChange}
           ></input>
           <label className="form-labels" of="from">
-            From:
+            From: {from}
           </label>
           <input
             id="from"
@@ -96,7 +96,7 @@ const EditProfile = ({
             onChange={handleChange}
           ></input>
           <label className="form-labels" of="to">
-            To:
+            To: {to}
           </label>
           <input
             id="to"
@@ -109,7 +109,14 @@ const EditProfile = ({
           <label className="form-labels" of="status">
             Skills:
           </label>
-          <select
+          <input
+            type="text"
+            placeholder="Skills"
+            value={skills}
+            onChange={handleChange}
+            name="skills"
+          />
+          {/* <select
             id="skills"
             name="skills"
             value={skills}
@@ -118,9 +125,9 @@ const EditProfile = ({
             <option value="0">*add your skills</option>
             <option value="backdesk">Backdesk</option>
             <option value="frontdesk">Frondesk</option>
-          </select>
+          </select> */}
           <p onClick={() => setToggleSocialInputs(!toggleSocialInputs)}>
-            Add Social links
+            {toggleSocialInputs ? `Hide social links` : `Show social links`}
           </p>
           {toggleSocialInputs && (
             <div>
@@ -152,6 +159,9 @@ const EditProfile = ({
         <p></p>
         <div className="bottom-part">
           <button type="submit">Save</button>
+          <Link to="/dashboard">
+            <button type="button">Back</button>
+          </Link>
         </div>
       </form>
     </Wrapper>
@@ -203,6 +213,7 @@ const Wrapper = styled.section`
   .bottom-part {
     display: flex;
     justify-content: center;
+    gap:1rem;
     button {
         border: none;
         background: #395a8d;
